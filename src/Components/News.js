@@ -43,18 +43,18 @@ async updateNews(){
   async componentDidMount() {
   this.updateNews();
   }
-  handleonPrev = async () => {
-    this.setState({
-      page: this.state.page - 1,
-    });
-    this.updateNews();
-  }
-  handleonNext = async () => {
-    this.setState({
-      page: this.state.page + 1,
-    });
-    this.updateNews();
-  }
+  // handleonPrev = async () => {
+  //   this.setState({
+  //     page: this.state.page - 1,
+  //   });
+  //   this.updateNews();
+  // }
+  // handleonNext = async () => {
+  //   this.setState({
+  //     page: this.state.page + 1,
+  //   });
+  //   this.updateNews();
+  // }
   fetchMoreData = async() => {
     this.setState({
       page:this.state.page+1
@@ -92,8 +92,8 @@ async updateNews(){
         
         </InfiniteScroll>
         <div className="container d-flex justify-content-between">
-          <button type="button" onClick={this.handleonPrev} className="btn btn-warning" disabled={this.state.page <= 1}>&larr; Prev</button>
-          <button className="btn btn-warning" type="button" onClick={this.handleonNext} disabled={this.state.page >= Math.ceil(this.state.totalResults / this.props.pagesize)}>Next &rarr;</button>
+          <button type="button"  className="btn btn-warning" disabled={this.state.page <= 1}>&larr; Prev</button>
+          <button className="btn btn-warning" type="button"  disabled={this.state.page >= Math.ceil(this.state.totalResults / this.props.pagesize)}>Next &rarr;</button>
         </div>
       </div>
     )
