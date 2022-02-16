@@ -28,16 +28,20 @@ Capitalize=(text)=>{
       articles: [],
       loading: false,
       page: 1,
-      totalResults: 1
+      totalResults: 0
     }
     document.title=`Cosmo News-${this.Capitalize(this.props.category)}`
   }
 async updateNews(){
+  this.props.setProgress(10);
   this.setState({ loading: true })
-  let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=817bc4c4ef3641319e677329256f17bf&page=${this.state.page}&pagesize=${this.props.pagesize}`;
+  let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=${this.props.apikey}&page=${this.state.page}&pagesize=${this.props.pagesize}`;
+  this.props.setProgress(30);
   let data = await fetch(url);
   let parsedData = await data.json();
+  this.props.setProgress(50);
   this.setState({ articles: parsedData.articles, totalResults: parsedData.totalResults, loading: false });
+  this.props.setProgress(100);
 }
 
   async componentDidMount() {
@@ -60,7 +64,7 @@ async updateNews(){
       page:this.state.page+1
     })
     this.setState({ loading: true })
-    let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=817bc4c4ef3641319e677329256f17bf&page=${this.state.page}&pagesize=${this.props.pagesize}`;
+    let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=${this.props.apikey}&page=${this.state.page}&pagesize=${this.props.pagesize}`;
     let data = await fetch(url);
     let parsedData = await data.json();
     this.setState({ articles: this.state.articles.concat(parsedData.articles) });
@@ -91,10 +95,10 @@ async updateNews(){
           </div>
         
         </InfiniteScroll>
-        <div className="container d-flex justify-content-between">
+        {/* <div className="container d-flex justify-content-between">
           <button type="button"  className="btn btn-warning" disabled={this.state.page <= 1}>&larr; Prev</button>
           <button className="btn btn-warning" type="button"  disabled={this.state.page >= Math.ceil(this.state.totalResults / this.props.pagesize)}>Next &rarr;</button>
-        </div>
+        </div> */}
       </div>
     )
   }
