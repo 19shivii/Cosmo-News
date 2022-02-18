@@ -1,13 +1,13 @@
 import React, { Component } from 'react'
 
-export class NewsItems extends Component {
-
-    render() {
-        let { title, description, imageUrl, newsurl, author, date ,source} = this.props;
+//export class NewsItems extends Component {
+const NewsItems=(props)=>{
+   // render() {
+      let { title, description, imageUrl, newsurl, author, date ,source} = props;
         return (
             <div className="card my-3 " style={{ width: '18rem', objectFit: "cover", boxShadow: '6px 10px 6px -3px rgba(148,142,142,0.75)' }}>
              <div style={{display:'flex',justifyContent:'flex-end',position:'absolute',right:'0'}}>
-             <span class=" badge rounded-pill bg-danger" >
+             <span className=" badge rounded-pill bg-danger" >
                     {source}
                 </span>
                 </div>  
@@ -21,7 +21,7 @@ export class NewsItems extends Component {
             </div>
 
         )
-    }
+    
 }
 
 export default NewsItems

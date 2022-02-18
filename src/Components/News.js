@@ -1,107 +1,86 @@
-import React, { Component } from 'react'
+import React, { useEffect, useState } from 'react'
 import NewsItems from './NewsItems'
 import Spinner from './Spinner';
 import PropTypes from 'prop-types';
 import InfiniteScroll from "react-infinite-scroll-component";
 
-// Specifies the default values for props:
+const News = (props)=>{
+  const [articles, setArticles] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [page, setPage] = useState(1)
+  const [totalResults, settotalResults] = useState(0)
+  const Capitalize = (text) => {
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  }
 
-export class News extends Component {
+  // document.title=`Cosmo News-${Capitalize(props.category)}`
 
-Capitalize=(text)=>{
-    return text.charAt(0).toUpperCase()+text.slice(1);
-  }
-  static defaultProps = {
-    country:'in',
-    pagesize:12,
-    category:'general'
-  }
-  
-  static propTypes = {
-    country: PropTypes.string,
-    category: PropTypes.string,
-    pagesize:PropTypes.number
-  }
-  constructor(props) {
-    super(props);
-    this.state = {
-      articles: [],
-      loading: false,
-      page: 1,
-      totalResults: 0
-    }
-    document.title=`Cosmo News-${this.Capitalize(this.props.category)}`
-  }
-async updateNews(){
-  this.props.setProgress(10);
-  this.setState({ loading: true })
-  let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=${this.props.apikey}&page=${this.state.page}&pagesize=${this.props.pagesize}`;
-  this.props.setProgress(30);
-  let data = await fetch(url);
-  let parsedData = await data.json();
-  this.props.setProgress(50);
-  this.setState({ articles: parsedData.articles, totalResults: parsedData.totalResults, loading: false });
-  this.props.setProgress(100);
-}
-
-  async componentDidMount() {
-  this.updateNews();
-  }
-  // handleonPrev = async () => {
-  //   this.setState({
-  //     page: this.state.page - 1,
-  //   });
-  //   this.updateNews();
-  // }
-  // handleonNext = async () => {
-  //   this.setState({
-  //     page: this.state.page + 1,
-  //   });
-  //   this.updateNews();
-  // }
-  fetchMoreData = async() => {
-    this.setState({
-      page:this.state.page+1
-    })
-    this.setState({ loading: true })
-    let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=${this.props.apikey}&page=${this.state.page}&pagesize=${this.props.pagesize}`;
+  const updateNews = async () => {
+    props.setProgress(10);
+    setLoading(true)
+    let url = `https://newsapi.org/v2/top-headlines?country=${props.country}&category=${props.category}&apiKey=${props.apikey}&page=${page}&pagesize=${props.pagesize}`;
+    props.setProgress(30);
     let data = await fetch(url);
     let parsedData = await data.json();
-    this.setState({ articles: this.state.articles.concat(parsedData.articles) });
-  
-  };
+    props.setProgress(50);
+    setArticles(parsedData.articles)
+    setLoading(false)
+    settotalResults(parsedData.totalResults)
+    props.setProgress(100);
 
-  render() {
-
-    return (
-      <div className="container ">
-        <h2 className='my-4 text-center'>Cosmo News :Top  {this.props.category} Headlines</h2>
-      {/* {this.state.loading && <Spinner />} */}
-      <InfiniteScroll
-          dataLength={this.state.articles.length}
-          next={this.fetchMoreData}
-          hasMore={this.state.articles.length!==this.state.totalResults}
-          loader={<Spinner/>}
-        >
-          <div className="container">
-          <div className="row">
-          { this.state.articles.map((element) => {
-            return <div className="col-md-4" key={element.url}>
-              <NewsItems title={element.title} description={element.description} imageUrl={element.urlToImage} newsurl={element.url} author={element.author} date={element.publishedAt} source={element.source.name} />
-            </div>
-          })}
-          
-        </div>
-          </div>
-        
-        </InfiniteScroll>
-        {/* <div className="container d-flex justify-content-between">
-          <button type="button"  className="btn btn-warning" disabled={this.state.page <= 1}>&larr; Prev</button>
-          <button className="btn btn-warning" type="button"  disabled={this.state.page >= Math.ceil(this.state.totalResults / this.props.pagesize)}>Next &rarr;</button>
-        </div> */}
-      </div>
-    )
   }
+  useEffect(() => {
+    updateNews();
+    document.title=`Cosmo News-${Capitalize(props.category)}`
+    }, [])
+
+  const fetchMoreData = async () => {
+    
+    //setLoading(true)
+    const url = `https://newsapi.org/v2/top-headlines?country=${props.country}&category=${props.category}&apiKey=${props.apikey}&page=${page+1}&pagesize=${props.pagesize}`;
+    setPage(page+1)
+    let data = await fetch(url);
+    let parsedData = await data.json();
+    setArticles(articles.concat(parsedData.articles))
+    settotalResults(parsedData.totalResults)
+
+  };
+  return (
+    <div className="container">
+      <h2 className='text-center' style={{marginTop:'100px'}}>Cosmo News :Top  {props.category} Headlines</h2>
+      {loading && <Spinner />}
+      <InfiniteScroll
+        dataLength={articles.length}
+        next={fetchMoreData}
+        hasMore={articles.length !== totalResults}
+        loader={<Spinner />}
+      >
+        <div className="container">
+          <div className="row">
+            {articles.map((element) => {
+              return <div className="col-md-4" key={element.url}>
+                <NewsItems title={element.title} description={element.description} imageUrl={element.urlToImage} newsurl={element.url} author={element.author} date={element.publishedAt} source={element.source.name} />
+              </div>
+            })}
+
+          </div>
+        </div>
+
+      </InfiniteScroll>
+    </div>
+  )
 }
 
+
+News.defaultProps = {
+  country: 'in',
+  pagesize: 12,
+  category: 'general'
+};
+News.propTypes = {
+  country: PropTypes.string,
+  category: PropTypes.string,
+  pagesize: PropTypes.number
+
+};
 export default News
